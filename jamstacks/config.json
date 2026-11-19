@@ -1,0 +1,19 @@
+{
+  "name": "Tall Tales Brewing Co.",
+  "description": "Vintage brewery taproom with old bottle-label art, a beers-on-tap list with ABV and style, food trucks and taproom hours.",
+  "tech": "next",
+  "type": "brewery",
+  "style": "taproom",
+  "internal": false,
+  "components": [
+    "support-form"
+  ],
+  "configFile": "site.config.json",
+  "screenshots": {
+    "light": "jamstacks/home-light.jpg",
+    "dark": "jamstacks/home-dark.jpg",
+    "theme": {
+      "strategy": "media"
+    }
+  }
+}

@@ -29,3 +29,28 @@ test('invalid/incomplete/overnight intervals name the weekday to fix', () => {
   assert.throws(() => validateHours(hours.slice(1)), /Monday/);
   assert.throws(() => validateHours(hours.map(x => x.day === 'Tuesday' ? { ...x, closes: undefined } : x)), /Tuesday/);
 });
+
+import { business } from '../content/business.ts';
+const taproom = (date: string) => openingLabel(business.hours, 'America/Los_Angeles', new Date(date));
+test('taproom hours: Tuesday 15:00 opens, 22:00 closes, Monday is closed all day', () => {
+  assert.equal(taproom('2026-11-17T22:59:00Z'), 'Closed · opens today at 15:00');
+  assert.equal(taproom('2026-11-17T23:00:00Z'), 'Open now · until 22:00');
+  assert.equal(taproom('2026-11-18T05:59:00Z'), 'Open now · until 22:00');
+  assert.equal(taproom('2026-11-18T06:00:00Z'), 'Closed · opens Wednesday at 15:00');
+  assert.equal(taproom('2026-11-16T20:00:00Z'), 'Closed · opens Tuesday at 15:00');
+  assert.equal(taproom('2026-11-17T02:00:00Z'), 'Closed · opens Tuesday at 15:00');
+});
+test('taproom hours: Saturday 12:00 opening holds across both Pacific DST changes', () => {
+  for (const [before, at] of [
+    ['2026-03-07T19:59:00Z', '2026-03-07T20:00:00Z'], // PST, before spring forward
+    ['2026-03-14T18:59:00Z', '2026-03-14T19:00:00Z'], // PDT, after spring forward
+    ['2026-10-31T18:59:00Z', '2026-10-31T19:00:00Z'], // PDT, before fall back
+    ['2026-11-07T19:59:00Z', '2026-11-07T20:00:00Z'], // PST, after fall back
+  ]) {
+    assert.equal(taproom(before), 'Closed · opens today at 12:00', before);
+    assert.equal(taproom(at), 'Open now · until 23:00', at);
+  }
+});
+test('taproom hours stay same-day: an overnight Friday fails validation', () => {
+  assert.throws(() => validateHours(business.hours.map(x => x.day === 'Friday' ? { ...x, closes: '01:00' } : x)), /Friday/);
+});

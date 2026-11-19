@@ -1,81 +1,139 @@
-# JamstackTemplates Next.js starter
+# Tall Tales Brewing Co.
 
-The shared starter for Next.js templates in the `JamstackTemplates` organization. Its canonical home is
-`JamstackTemplates/template-next`, alongside the templates generated from it.
-It is not a gallery design or a published demo. Business content is sample content. No application code
-in a website created from this template depends on the starter checkout or the portal repository.
+A static Next.js website for **Tall Tales Brewing Co.**, a fictitious small-batch brewery with an
+vintage brick taproom in downtown Portland. It is a sample for the Jamstacks gallery
+(`next-brewery-taproom`): vintage bottle-label art, a tap list with ABV, IBU and style, a nightly food-truck
+line-up, taproom hours with an open-now badge, and a hosted enquiry form for tours, events and
+wholesale kegs.
 
-## Build your website
+**Everything in `content/` is sample data**, including the name, email, phone and hours. The address is
+a public landmark (Pioneer Courthouse Square) so the map has a pin. Replace all of it before
+publishing a real taproom's site.
 
-Start in the checkout of the repository GitHub created from `JamstackTemplates/template-next`. All
-starter files are already present. Local development requires Node 24 or later and npm.
+## Run it locally
 
-To build a new site, fill in `plan/PLAN.md`, then tell the coding agent **`Implement plan/PLAN.md`**.
-After reviewing the finished site, delete `plan/` to remove all initial build instructions.
+Node 24 or later and npm are required.
 
-To preview locally, run `npm ci` and `npm run dev` from the repository root.
+```sh
+npm ci
+npm run dev        # http://localhost:3000
+npm run check      # tests, typecheck and static export to out/
+```
 
 ## Pages
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Minimal content-driven home page and Organization JSON-LD |
-| `/contact/` | Hosted support form when configured; visible email alternative |
-| `/404.html` | Friendly static error page |
+| `/` | Hero with open-now status, six "Pouring now" cans, tonight's truck, address and hours, tours/events/kegs, responsible-service strip, Brewery JSON-LD |
+| `/taps/` | Full tap board grouped as pouring now, coming soon and kicked, with a style filter, pour sizes and the allergen note |
+| `/food-trucks/` | This week's line-up (today highlighted in the browser) and the truck roster |
+| `/visit/` | Address, hours, map, getting here, taproom rules and Saturday brewhouse tours |
+| `/contact/` | Hosted enquiry form when configured; the public email is always visible |
+| `/404.html` | "This keg's kicked" error page |
 
-## Make it yours
+## Common edits
+
+| To change… | Edit |
+| --- | --- |
+| A keg kicks, or a new one goes on | `content/taps.ts`: set the beer's `availability` to `kicked`, `on-tap` or `coming-soon` |
+| A tap number | `content/taps.ts`: `tap` (1–12). Two `on-tap` beers can't share a tap |
+| A new beer | `content/taps.ts`: copy an entry, give it a new unique `id`, and fill in every field |
+| A price | `content/taps.ts`: `prices` in whole US cents (`750` is $7.50) |
+| Tonight's food truck | `content/food-trucks.ts`: change `truckId` on that day in `schedule` |
+| A new truck | `content/food-trucks.ts`: add it to `trucks`, then reference its `id` from `schedule` |
+| Hours, address, email, phone, tours | `content/business.ts` |
+| Headings, intros, buttons and notes | The route's `app/**/page.tsx`, e.g. `<Hero.Heading>` in `app/page.tsx` |
+| Name, description, domain, time zone | `site.config.json` (and `business.name`) |
+
+Every collection is validated when it's imported. A mistake stops `npm run check` and the build with
+a message that names the item, for example:
+
+```
+taps: "tall-tale-ipa" and "fog-machine" are both on tap 3
+food-trucks: schedule Tuesday: serves 14:00–21:00 must sit inside taproom hours 15:00–22:00
+```
+
+### Beer fields (`content/taps.ts`)
+
+| Field | Meaning |
+| --- | --- |
+| `id` | Stable URL-safe slug, unique; don't change it once published |
+| `tap` | Tap number 1–12; unique among `on-tap` beers |
+| `name`, `style`, `description` | Printed on the can card; description is one sentence |
+| `styleFamily` | Filter group: `lager`, `hoppy`, `sour`, `dark`, `non-alcoholic` (below 0.5% ABV) |
+| `abv` | Percent, 0–15, one decimal place. The brass gauge under the label fills from 0 to 12% |
+| `ibu` | 0–120, optional (left out for sours) |
+| `label` | Label ink colourway: `navy`, `mustard`, `hop`, `oxblood`, `cream`, `stout` |
+| `glutenReduced` | `true` adds a "Gluten-reduced" note to the card |
+| `availability` | `on-tap`, `coming-soon` or `kicked`; the board orders them in that order |
+| `prices` | Whole cents for `taster` (5 oz), `half` (8 oz), `pint` (16 oz), `crowler` (32 oz to go). Must rise in that order. `pint` may be left out only above 10% ABV; leave out `crowler` if a beer isn't sold to go |
+
+### Food truck fields (`content/food-trucks.ts`)
+
+`trucks` have an `id`, `name`, `cuisine`, `description` and `dietary` tags (`vegetarian`,
+`vegan-options`, `gluten-free-options`). `schedule` has exactly one entry per weekday with a `truckId`
+(or `null`) and a `serves` window that must sit inside that day's taproom hours. No truck can be
+scheduled on a closed day.
+
+## Files
 
 | File | Owns |
 | --- | --- |
-| `content/business.ts` | Shared business name, contact details and starter sample copy |
-| `app/page.tsx`, `app/<route>/page.tsx` | Page composition and editable copy such as headings and calls to action |
-| `content/menu.ts` or `content/services.ts` (add when needed) | Industry-specific typed collections |
-| `site.config.json` | Public name, description, hostname, optional timeZone and Jamstacks integration |
-| `app/tailwind.input.css` | Theme tokens, utility mappings and small shared styles |
-| `components/site-header.tsx`, `site-footer.tsx` | Replaceable navigation and visual shell |
-| `lib/structured-data.ts` | Schema type/properties derived from real content |
-| `app/sitemap.ts` | Public routes; update when adding a page |
+| `content/business.ts` | Name, contact details, address, directions, hours, tour details, responsible-service line, enquiry copy |
+| `content/taps.ts` | The tap list, style families, can colourways, pour sizes and validation |
+| `content/food-trucks.ts` | Trucks, the weekly schedule and validation |
+| `app/page.tsx`, `app/<route>/page.tsx` | Page composition and editable copy |
+| `components/tap-card.tsx`, `tap-board.tsx` | The bottle-label card and the filterable tap board |
+| `components/brewery-art.tsx` | SVG artwork: hop badge (logo) and empty pint (404) |
+| `components/cellar-art.tsx` | SVG cellar art: barrel rack above the footer, tap tower (Taps) |
+| `public/brewery-light.webp` | Hero illustration (2400×1792 original); `brewery-light-{800,1200,1600}.webp` are the sizes the page serves. Used in both themes, slightly dimmed in dark mode |
+| `components/food-trucks.tsx`, `open-badge.tsx`, `use-business-now.ts` | Browser-only time-dependent displays |
+| `components/site-header.tsx`, `site-footer.tsx`, `page-head.tsx`, `hero.tsx`, `section.tsx`, `visit-details.tsx` | Shell and section components |
+| `app/tailwind.input.css` | Colour tokens (light, automatic dark, explicit dark), label ink colourways, shared component styles |
+| `lib/structured-data.ts` | schema.org `Brewery` derived from `content/business.ts` |
+| `lib/metadata.ts`, `lib/routes.ts` | Per-page metadata and the route list used by the sitemap |
+| `site.config.json` | Public name, description, hostname, time zone and Jamstacks integration |
+| `public/og.png` | 1200×630 social image |
 
-Edit page copy in the route file, for example `<Hero.Heading>Seasonal flowers</Hero.Heading>`
-in `app/page.tsx` for the Home page. The backing
-component owns the styling and interactions. Use typed fields for data the site needs to look up or
-reuse. For example, change `business.email` to update Contact. Rename in `business.name` and
-`site.config.json.name`. Add a typed core-content file for frequent owner edits: a food menu should use
-the existing sections/items/price/availability model; changes such as sold out, seasonal or a new section
-should be data edits with actionable content tests. Do not add business content to configuration: the
-Jamstacks provisioner replaces that file wholesale, possibly adding `provisioningId`.
+## Design and behavior
 
-## Appearance and optional local-business features
+"Old brewery label": aged label paper with a fine grain, sunburst rays, letterpress double rules,
+a brewery-green enamel-sign header and footer edged in brass, and oxblood ornaments. Each beer is a
+vintage bottle label printed in one of six old inks, with the style in sign-writer's script, an ABV/IBU
+ribbon and a rubber "Kicked" stamp. The hero is a hand-painted taproom illustration with the brewery name in gold
+lettering, a rack of stacked barrels runs above the footer, kraft bands carry an engraved hop-and-barley
+wallpaper and the Taps page has a tap tower. Dark mode is a lamplit cellar in deep browns. Fonts are self-hosted
+from npm, all under the SIL Open Font License 1.1: **Alfa Slab One** (wood-type headings and beer
+names), **Vollkorn** (body, with italics) and **Yesteryear** (script accents), via `@fontsource/*` and
+`@fontsource-variable/vollkorn`. The primary brewery green carries white button text at 10:1 in light
+mode and 6.5:1 in dark. `tests/design.test.ts` checks every label colourway and theme pairing against WCAG AA.
 
-The starter uses system fonts, neutral Tailwind v4 tokens and the published `jamstacks` package's
-ThemeProvider, ThemeScript and DarkModeToggle. No font download or font licence file is needed for
-system fonts. Each designed template chooses and documents self-hosted font packages and their licences.
-Utilities live in components; colours originate in CSS tokens with light, automatic-dark and explicit-dark
-values plus `@theme inline` mappings. Keep the hosted form's primary fill dark enough for white text.
-Keyboard focus, reduced motion and print styles are included. The footer credit is yours to keep,
-reword or remove.
+Time-dependent output runs only in the browser in the `site.config.json` time zone
+(`America/Los_Angeles`), refreshing every minute:
 
-For a business with visiting hours, add address/directions/hours to typed content, set the IANA `timeZone`
-in site.config.json and use optional `GoogleMap`, `TimeZoneNote` and `OpenBadge` components. GoogleMap
-accepts an address and descriptive title; map helpers need no key. `OpenBadge` accepts seven
-`OpeningHours` records, uses the business zone and refreshes each minute in the browser; static/no-JS
-output is neutral. Same-day intervals only: overnight hours fail validation and need a tested extension
-before use. The baseline home page does not load a map or assert opening hours.
+- the open-now badge (header, Home hero and Visit)
+- tonight's truck on Home
+- today's highlighted row on Food trucks
+
+Static and no-JavaScript output stays neutral: "Taproom hours", the full weekly line-up and the full
+hours table. Hours are same-day only; overnight intervals fail validation. The Taps style filter
+appears only with JavaScript and keeps the choice in `?style=`. Without it, every beer is shown.
+Reduced motion disables the ABV gauge "pour" animation. Print styles drop navigation, the map and the art.
 
 ## Public configuration
 
 ```json
 {
-  "name": "Business name",
-  "description": "Public description",
-  "domain": "next-business-minimal.jamstacks.net",
-  "timeZone": "America/New_York",
+  "name": "Tall Tales Brewing Co.",
+  "description": "Tall Tales Brewing Co. pours small-batch beer from …",
+  "domain": "next-brewery-taproom.jamstacks.net",
+  "timeZone": "America/Los_Angeles",
   "jamstacks": { "siteId": "", "cdnUrl": "https://cdn.jamstacks.net" }
 }
 ```
 
-The starter itself leaves domain/timeZone unset. Gallery templates use their folder name plus
-`.jamstacks.net`; customers replace the demo domain with their own. Do not invent canonical URLs when
+This gallery sample uses its folder name plus `.jamstacks.net` as the demo domain; replace it with
+your own domain. Do not invent canonical URLs when
 the deployed address is unknown.
 
 | Environment variable | Public build-time meaning |
@@ -113,8 +171,10 @@ PAGES_BASE_PATH=/preview PAGES_BASE_URL=https://owner.github.io/preview npm run 
 npm start -- --base /preview --port 3000
 ```
 
-Tests cover config/provisioner compatibility, embed state, content rules, optional opening hours,
-and structured-data escaping. Typecheck uses Next's generated route types.
+Tests cover config/provisioner compatibility, embed state, business content and tour rules, tap and
+food-truck validation (including the common owner edits), taproom hours with their boundaries and
+Pacific DST changes, palette contrast, page copy rules (21+ wording, allergens, enquiry-only
+language) and structured-data escaping. Typecheck uses Next's generated route types.
 When changing the Contact integration, base paths or canonical URLs, check the exported HTML and
 sitemap. Verify both configured and unconfigured Contact with the corresponding build settings.
 Test light/dark at desktop and mobile widths, keyboard navigation, unknown routes, repeated Contact

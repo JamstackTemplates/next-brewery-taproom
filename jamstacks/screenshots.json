@@ -1,0 +1,22 @@
+{
+  "templateId": "next-brewery-taproom",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "fullPage": false,
+  "captures": [
+    {
+      "mode": "light",
+      "sha256": "056fc0db5977f31a6b50fc73f6dbee6b3e6a66f10445178eb3ac28e6d214e02a",
+      "file": "jamstacks/home-light.jpg",
+      "bytes": 199918
+    },
+    {
+      "mode": "dark",
+      "sha256": "92c440c517b6480efeb70a69a348ec0825c5e470091fb91a4aac31de4704f481",
+      "file": "jamstacks/home-dark.jpg",
+      "bytes": 186550
+    }
+  ]
+}

@@ -13,6 +13,22 @@ When asked to `Implement plan/PLAN.md`, read the brief there and the shared buil
 `plan/PROMPT_TEMPLATE.md`, then implement the site in the current checkout. The `plan/` folder is
 for initial creation and can be deleted after review. Keep it out of website code and public assets.
 
+## This website: Tall Tales Brewing Co.
+
+Gallery sample `next-brewery-taproom` (all business data is fictitious). File ownership:
+
+- `content/taps.ts`: the tap list (most frequent edit), style families, can colourways, pour sizes, `validateBeers`.
+- `content/food-trucks.ts`: trucks, the seven-day schedule, `validateFoodTrucks` (serving windows inside hours).
+- `content/business.ts`: contact details, address, directions, hours, tour details, responsible-service line,
+  enquiry copy, `validateBusiness`. Validators run on import, so bad data fails the build with the item's id.
+- `app/**/page.tsx`: page copy in visitor order. `components/` own markup and styles: `tap-card.tsx` (signature
+  bottle-label card), `tap-board.tsx` (filter, `?style=`), `food-trucks.tsx`, `open-badge.tsx` and `use-business-now.ts`
+  (browser-only time logic), `brewery-art.tsx` (SVG hop badge, empty pint), `cellar-art.tsx`
+  (barrel rack, tap tower); the hero illustration is `public/brewery-light*.webp`, `hero.tsx`, `section.tsx`, `visit-details.tsx`, shell.
+- `app/tailwind.input.css`: paper/enamel-sign/brass tokens and `--label-*` ink colourways; `tests/design.test.ts` checks contrast.
+- `lib/metadata.ts` (per-page metadata and OG image), `lib/routes.ts` (sitemap list), `lib/structured-data.ts` (`Brewery`).
+- Responsible-service wording must stay on Home, Visit and the footer; the allergen note on Taps (`tests/pages.test.ts`).
+
 ## Structure and content
 
 `content/business.ts` holds the starter's shared business details and sample copy. When building a

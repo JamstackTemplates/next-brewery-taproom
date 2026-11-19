@@ -1,7 +1,8 @@
 {
-  "name": "Jamstacks starter",
-  "description": "A neutral Next.js foundation for Jamstacks websites.",
-  "domain": "",
+  "name": "Tall Tales Brewing Co.",
+  "description": "Tall Tales Brewing Co. pours small-batch beer from a vintage brick taproom in downtown Portland, with a rotating food truck every night we're open.",
+  "domain": "next-brewery-taproom.jamstacks.net",
+  "timeZone": "America/Los_Angeles",
   "jamstacks": {
     "siteId": "",
     "cdnUrl": "https://cdn.jamstacks.net"

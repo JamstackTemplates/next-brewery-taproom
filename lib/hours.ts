@@ -23,19 +23,30 @@ export function validateHours(hours: readonly OpeningHours[]): void {
   }
   if (hours.length !== 7) throw new Error('hours: expected seven weekdays');
 }
-/** Browser callers supply the clock; build/static views never compute current availability. */
-export function openingLabel(hours: readonly OpeningHours[], timeZone: string, now = new Date()): string {
-  const fallback = 'See opening hours';
-  if (!timeZone) return fallback;
-  validateHours(hours);
+/** Minutes after local midnight for a validated HH:MM value. */
+export const clockMinutes = minutes;
+
+/** The weekday and local minutes in the business zone, or null when the zone is missing or invalid. */
+export function zonedNow(timeZone: string, now = new Date()): { day: Day; minutes: number } | null {
+  if (!timeZone) return null;
   let parts: Intl.DateTimeFormatPart[];
   try {
     parts = new Intl.DateTimeFormat('en-US', { timeZone, weekday: 'long', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' }).formatToParts(now);
-  } catch { return fallback; }
+  } catch { return null; }
   const part = (type: string) => parts.find(entry => entry.type === type)?.value ?? '';
-  const index = DAYS.indexOf(part('weekday') as Day);
-  if (index < 0) return fallback;
-  const current = Number(part('hour')) * 60 + Number(part('minute'));
+  const day = part('weekday') as Day;
+  if (!DAYS.includes(day)) return null;
+  return { day, minutes: Number(part('hour')) * 60 + Number(part('minute')) };
+}
+
+/** Browser callers supply the clock; build/static views never compute current availability. */
+export function openingLabel(hours: readonly OpeningHours[], timeZone: string, now = new Date()): string {
+  const fallback = 'See opening hours';
+  validateHours(hours);
+  const zoned = zonedNow(timeZone, now);
+  if (!zoned) return fallback;
+  const index = DAYS.indexOf(zoned.day);
+  const current = zoned.minutes;
   const today = hours.find(entry => entry.day === DAYS[index])!;
   if (today.opens && today.closes && current >= minutes(today.opens) && current < minutes(today.closes)) return `Open now · until ${today.closes}`;
   for (let offset = 0; offset <= 7; offset++) {
